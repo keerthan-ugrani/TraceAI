@@ -1,0 +1,19 @@
+requirement_id,title,text,component,classification,status,verification_method,source,revision
+REQ-001,Thermal shutdown,The controller should stop charging quickly when the pad gets too hot.,Charging Controller,SAFETY,DRAFT,,System Specification,1
+REQ-002,Lateral displacement detection,The alignment monitor shall detect a lateral displacement greater than 15 mm.,Alignment Sensor,FUNCTIONAL,APPROVED,TEST,System Specification,2
+REQ-003,Voltage sampling,The telemetry service shall record charging voltage at least once every 1 s.,Telemetry Service,DIAGNOSTIC,APPROVED,TEST,Diagnostics Specification,1
+REQ-004,Communication error handling,Communication errors shall be handled appropriately.,Communication Module,CYBERSECURITY,DRAFT,,Cybersecurity Specification,1
+REQ-005,Authentication interlock,The controller shall prevent power transfer when authentication status is INVALID.,Charging Controller,CYBERSECURITY,APPROVED,TEST,Cybersecurity Specification,3
+REQ-006,Vehicle detection sequence,The system shall detect the vehicle and shall initiate the alignment sequence.,Alignment Controller,FUNCTIONAL,DRAFT,DEMONSTRATION,System Specification,1
+REQ-007,Overtemperature response,"When pad temperature exceeds 80 degC, the controller shall disable power transfer within 100 ms.",Charging Controller,SAFETY,APPROVED,TEST,Safety Requirements,4
+REQ-008,Charging-state display,The monitoring dashboard will display the latest charging state.,Monitoring Dashboard,DIAGNOSTIC,DRAFT,DEMONSTRATION,Diagnostics Specification,1
+REQ-009,Diagnostic information,The control unit shall provide sufficient diagnostic information.,Control Unit,DIAGNOSTIC,DRAFT,INSPECTION,Diagnostics Specification,1
+REQ-010,Event retention,The event logger shall retain the most recent 10000 charging events.,Event Logger,DIAGNOSTIC,APPROVED,TEST,Diagnostics Specification,2
+REQ-011,Isolation check,The isolation monitor shall complete its startup self-test within 2 s.,Isolation Monitor,SAFETY,APPROVED,TEST,Safety Requirements,3
+REQ-012,Insulation interlock,"If insulation resistance is below the configured safety threshold, the controller shall inhibit power transfer.",Charging Controller,SAFETY,APPROVED,TEST,Safety Requirements,4
+REQ-013,Firmware identification,The controller shall expose its firmware version through the diagnostic interface.,Control Unit,DIAGNOSTIC,DRAFT,,Diagnostics Specification,1
+REQ-014,Authentication retry,The connector may retry authentication after a timeout.,Communication Module,CYBERSECURITY,DRAFT,ANALYSIS,Cybersecurity Specification,1
+REQ-015,Authentication lockout,"After 3 consecutive authentication failures, the controller shall block further attempts for 60 s.",Charging Controller,CYBERSECURITY,APPROVED,TEST,Cybersecurity Specification,2
+REQ-016,Rain operation,It shall operate normally during rain.,Vehicle Unit,FUNCTIONAL,DRAFT,DEMONSTRATION,Environmental Specification,1
+REQ-017,Communication-loss logging,The controller shall record a diagnostic event within 1 s after loss of communication.,Charging Controller,DIAGNOSTIC,APPROVED,TEST,Diagnostics Specification,2
+REQ-018,Status and fault handling,The user interface shall show charging status and the communication module shall log communication faults.,User Interface,FUNCTIONAL,DRAFT,TEST,System Specification,1

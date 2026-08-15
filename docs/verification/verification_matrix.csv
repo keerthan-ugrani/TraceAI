@@ -1,0 +1,13 @@
+requirement_id,verification_test_id,test_type,status,evidence
+POC-SWR-001,VER-001,automated,PASS,tests/verification/test_poc_requirements.py::test_poc_swr_001_full_bidirectional_requirement_trace
+POC-SWR-002,VER-002,automated,PASS,tests/verification/test_poc_requirements.py::test_poc_swr_002_detect_missing_links
+POC-SWR-003,VER-003,automated,PASS,tests/verification/test_poc_requirements.py::test_poc_swr_003_detect_configuration_mismatch
+POC-SWR-004,VER-004,automated,PASS,tests/unit/test_failure_analysis.py::test_localizes_first_failure_to_integration
+POC-SWR-005,VER-005,automated,PASS,tests/verification/test_poc_requirements.py::test_poc_swr_004_propagate_failure_and_block_release
+POC-SWR-006,VER-006,automated,PASS,tests/verification/test_poc_requirements.py::test_poc_swr_005_ground_rca_in_evidence
+POC-SWR-007,VER-007,automated,PASS,tests/unit/test_change_release_reasoning.py::test_change_impact_groups_artifacts_and_marks_stale_items
+POC-SWR-008,VER-008,automated,PASS,tests/unit/test_change_release_reasoning.py::test_release_is_blocked_by_tests_defect_gaps_and_configuration
+POC-SWR-009,VER-009,automated,PASS,tests/unit/test_change_release_reasoning.py::test_reasoning_is_grounded_and_auditable
+POC-SWR-010,VER-010,integration,PASS,tests/integration/test_streamlit_app.py::test_streamlit_hero_analysis_renders_engineering_intelligence
+POC-SWR-011,VER-011,regression,PASS,tests/integration/test_analysis_pipeline.py::test_complete_sample_pipeline_produces_reproducible_outputs
+POC-SWR-012,VER-012,inspection,PASS,.github/workflows/ci.yml

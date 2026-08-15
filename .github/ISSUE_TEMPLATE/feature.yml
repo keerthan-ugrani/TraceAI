@@ -1,0 +1,38 @@
+name: Feature
+description: Propose a bounded TraceAI capability
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Engineering problem
+      description: Describe the workflow problem without prescribing a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] Observable outcome 1
+        - [ ] Observable outcome 2
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and validation
+      description: Explain the test data and metrics that will demonstrate success.
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: AI risk tier
+      options:
+        - Green - informational only
+        - Amber - engineer approval required
+        - Red - safety or control impact
+    validations:
+      required: true
