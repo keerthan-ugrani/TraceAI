@@ -1,0 +1,13 @@
+requirement_id,architecture_component,implementation,verification
+POC-SWR-001,EngineeringGraph;TraceabilityEngine,src/traceai/engineering_graph.py;src/traceai/traceability.py,VER-001
+POC-SWR-002,TraceabilityEngine,src/traceai/traceability.py,VER-002
+POC-SWR-003,ConfigurationEngine,src/traceai/configuration.py,VER-003
+POC-SWR-004,FailureAnalysisService,src/traceai/failure_analysis.py,VER-004
+POC-SWR-005,FailureAnalysisService,src/traceai/failure_analysis.py,VER-005
+POC-SWR-006,EngineeringReasoningService,src/traceai/reasoning.py,VER-006
+POC-SWR-007,ChangeImpactService,src/traceai/change_impact.py,VER-007
+POC-SWR-008,ReleaseEligibilityEngine,src/traceai/release.py,VER-008
+POC-SWR-009,RootCauseAnalysis,src/traceai/engineering_models.py;src/traceai/reasoning.py,VER-009
+POC-SWR-010,Application Interfaces,src/traceai/intelligence.py;src/traceai/cli.py;app.py,VER-010
+POC-SWR-011,RequirementQualityAnalyzer,src/traceai/analyzer.py;src/traceai/pipeline.py,VER-011
+POC-SWR-012,CI Pipeline,.github/workflows/ci.yml;Makefile,VER-012
