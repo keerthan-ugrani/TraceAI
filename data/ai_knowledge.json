@@ -1,0 +1,302 @@
+{
+  "schema_version": "2.0",
+  "description": "Synthetic automotive AI knowledge for TraceAI Enhancements 1-6. No Easelink, customer, employee, vehicle, or confidential engineering data is included.",
+  "data_classification": "SYNTHETIC",
+  "requirements": [
+    {
+      "id": "SWE-REQ-014",
+      "text": "When lateral alignment error exceeds 5 mm during CHARGING_PREPARATION, the charging controller shall disable power-transfer authorization within 100 ms and shall keep authorization disabled until alignment state ALIGNED is received through ARCH-IF-006.",
+      "source": "Synthetic Software Requirements Specification v3.2",
+      "status": "APPROVED",
+      "related_artifact_ids": [
+        "ARCH-COMP-004",
+        "ARCH-IF-006",
+        "DD-018",
+        "SW-UNIT-007",
+        "IT-045"
+      ]
+    },
+    {
+      "id": "SWE-REQ-030",
+      "text": "When an authenticated charging session is cancelled, the controller shall open the power contactor within 150 ms and record cancellation reason USER_REQUEST.",
+      "source": "Synthetic Software Requirements Specification v1.0",
+      "status": "APPROVED",
+      "related_artifact_ids": [
+        "ARCH-COMP-030",
+        "SW-UNIT-030",
+        "IT-030"
+      ]
+    },
+    {
+      "id": "SWE-REQ-031",
+      "text": "The system should quickly stop charging when alignment is not good.",
+      "source": "Synthetic Change Proposal CP-031",
+      "status": "DRAFT",
+      "related_artifact_ids": [
+        "ARCH-IF-006"
+      ]
+    }
+  ],
+  "candidate_artifacts": [
+    {
+      "id": "DD-CAND-101",
+      "artifact_type": "DETAILED_DESIGN",
+      "name": "Charging authorization state guard",
+      "text": "The design blocks contactor authorization when lateral alignment error is above 5 mm and keeps the guard active until the AlignmentStatus value ALIGNED is consumed.",
+      "version": "0.3",
+      "linked_requirement_ids": []
+    },
+    {
+      "id": "IT-CAND-201",
+      "artifact_type": "INTEGRATION_TEST",
+      "name": "Alignment contract boundary verification",
+      "text": "Verify that alignment errors of 5.1 mm block power transfer within 100 ms and that the interface consumer accepts only the ALIGNED enumeration.",
+      "version": "0.1",
+      "linked_requirement_ids": []
+    },
+    {
+      "id": "UT-CAND-202",
+      "artifact_type": "UNIT_TEST",
+      "name": "Authorization timeout unit boundary",
+      "text": "Exercise the charging authorization timer at 99 ms, 100 ms, and 101 ms after a misalignment event and verify the power authorization boolean.",
+      "version": "0.1",
+      "linked_requirement_ids": []
+    },
+    {
+      "id": "ARCH-CAND-203",
+      "artifact_type": "ARCHITECTURE_INTERFACE",
+      "name": "AlignmentStatus enumeration contract",
+      "text": "The producer and consumer exchange UNKNOWN, MISALIGNED, ALIGNING, and ALIGNED values through one versioned interface contract.",
+      "version": "2.2-draft",
+      "linked_requirement_ids": []
+    },
+    {
+      "id": "REQ-CAND-301",
+      "artifact_type": "SYSTEM_REQUIREMENT",
+      "name": "Cabin ambient-light preference",
+      "text": "The cabin controller stores the driver's selected ambient-light color for the next authenticated journey.",
+      "version": "1.0",
+      "linked_requirement_ids": []
+    },
+    {
+      "id": "TEST-CAND-302",
+      "artifact_type": "COMPONENT_TEST",
+      "name": "Infotainment language selection",
+      "text": "Verify that the infotainment display restores the previously selected language after a restart.",
+      "version": "1.0",
+      "linked_requirement_ids": []
+    }
+  ],
+  "engineering_logs": [
+    {
+      "id": "LOG-IT-045",
+      "requirement_id": "SWE-REQ-014",
+      "test_id": "IT-045",
+      "component_ids": [
+        "ARCH-COMP-004",
+        "ARCH-COMP-005",
+        "ARCH-IF-006"
+      ],
+      "lines": [
+        "2026-08-12T10:15:31.101Z bench=HIL-04 test=IT-045 state=CHARGING_PREPARATION",
+        "2026-08-12T10:15:31.113Z component=AlignmentController interface=ARCH-IF-006 version=2.0 publish=VALID lateral_error_mm=5.4",
+        "2026-08-12T10:15:31.116Z component=ChargingStateMachine interface=ARCH-IF-006 version=2.1 expected=ALIGNED received=VALID action=REJECT",
+        "2026-08-12T10:15:31.121Z component=PowerAuthorization authorization=false reason=ALIGNMENT_STATE_INVALID",
+        "2026-08-12T10:15:31.124Z test=IT-045 result=FAIL expected=ALIGNED actual=VALID"
+      ],
+      "expected": "ARCH-IF-006 delivers ALIGNED and power authorization remains disabled for misalignment.",
+      "actual": "Producer publishes VALID while the consumer expects ALIGNED; IT-045 fails.",
+      "evidence_ids": [
+        "LOG-IT-045",
+        "SWE-REQ-014",
+        "IT-045",
+        "ARCH-IF-006",
+        "ARCH-COMP-004",
+        "ARCH-COMP-005",
+        "BUILD-158"
+      ]
+    },
+    {
+      "id": "LOG-IT-030",
+      "requirement_id": "SWE-REQ-030",
+      "test_id": "IT-030",
+      "component_ids": [
+        "ARCH-COMP-030"
+      ],
+      "lines": [
+        "2026-08-12T11:00:00.000Z test=IT-030 event=USER_REQUEST",
+        "2026-08-12T11:00:00.112Z contactor=OPEN reason=USER_REQUEST",
+        "2026-08-12T11:00:00.120Z test=IT-030 result=PASS latency_ms=112"
+      ],
+      "expected": "Contactor opens within 150 ms and cancellation reason is retained.",
+      "actual": "Contactor opens in 112 ms and reason USER_REQUEST is retained.",
+      "evidence_ids": [
+        "LOG-IT-030",
+        "SWE-REQ-030",
+        "IT-030",
+        "ARCH-COMP-030"
+      ]
+    }
+  ],
+  "historical_defects": [
+    {
+      "id": "DEFECT-011",
+      "title": "AlignmentStatus enumeration drift after interface upgrade",
+      "description": "An integration test rejected VALID because the downstream charging state machine expected ALIGNED after a partial interface deployment.",
+      "symptoms": [
+        "unit verification passed",
+        "integration verification failed",
+        "producer and consumer used different enumeration names"
+      ],
+      "root_cause": "Producer remained on interface v2.0 while the consumer used v2.1.",
+      "resolution": "Baseline one generated interface package for both components and add a compatibility integration test.",
+      "component_ids": [
+        "ARCH-COMP-004",
+        "ARCH-COMP-005",
+        "ARCH-IF-006"
+      ],
+      "evidence_ids": [
+        "DEFECT-011",
+        "ARCH-IF-006",
+        "IT-HIST-011"
+      ]
+    },
+    {
+      "id": "DEFECT-019",
+      "title": "Stale interface package deployed to HIL bench",
+      "description": "A green component build failed on the integration bench because the bench image contained an older interface package.",
+      "symptoms": [
+        "component test passed",
+        "HIL integration failed",
+        "runtime contract version differed from build manifest"
+      ],
+      "root_cause": "The HIL deployment manifest referenced the previous configuration baseline.",
+      "resolution": "Validate deployed package hashes against the approved baseline before test execution.",
+      "component_ids": [
+        "ARCH-COMP-005",
+        "ARCH-IF-006"
+      ],
+      "evidence_ids": [
+        "DEFECT-019",
+        "ARCH-IF-006",
+        "BASELINE-HIST-019"
+      ]
+    },
+    {
+      "id": "DEFECT-023",
+      "title": "Charging state machine rejects alignment producer value",
+      "description": "IT-045 fails when AlignmentController publishes VALID and ChargingStateMachine expects ALIGNED.",
+      "symptoms": [
+        "IT-045 expected ALIGNED actual VALID",
+        "authorization remains false",
+        "interface mismatch reported at ARCH-IF-006"
+      ],
+      "root_cause": "The components were built against different controlled versions of ARCH-IF-006.",
+      "resolution": "Deliver COMMIT-c821ac, rebuild both components against v2.1, and re-run IT-045.",
+      "component_ids": [
+        "ARCH-COMP-004",
+        "ARCH-COMP-005",
+        "ARCH-IF-006"
+      ],
+      "evidence_ids": [
+        "DEFECT-023",
+        "IT-045",
+        "ARCH-IF-006",
+        "COMMIT-c821ac"
+      ]
+    },
+    {
+      "id": "DEFECT-088",
+      "title": "Infotainment theme resets after profile switch",
+      "description": "The display uses the default theme after switching driver profiles.",
+      "symptoms": [
+        "theme preference not restored",
+        "display uses default color"
+      ],
+      "root_cause": "The profile service did not persist the theme key.",
+      "resolution": "Persist and reload the theme key with the driver profile.",
+      "component_ids": [
+        "ARCH-COMP-088"
+      ],
+      "evidence_ids": [
+        "DEFECT-088",
+        "IT-HIST-088"
+      ]
+    }
+  ],
+  "test_generation_contexts": [
+    {
+      "requirement_id": "SWE-REQ-014",
+      "requirement_text": "When lateral alignment error exceeds 5 mm during CHARGING_PREPARATION, the charging controller shall disable power-transfer authorization within 100 ms and shall keep authorization disabled until alignment state ALIGNED is received through ARCH-IF-006.",
+      "architecture_context": [
+        "AlignmentController produces alignment status and lateral error.",
+        "ChargingStateMachine consumes ARCH-IF-006 and controls authorization.",
+        "PowerAuthorization prevents contactor closing when authorization is false."
+      ],
+      "interface_contracts": [
+        "ARCH-IF-006 v2.1 values are UNKNOWN, MISALIGNED, ALIGNING, and ALIGNED.",
+        "The older v2.0 producer used VALID where v2.1 uses ALIGNED."
+      ],
+      "acceptance_criteria": [
+        "5.1 mm misalignment disables authorization no later than 100 ms.",
+        "Authorization stays disabled until ALIGNED is received.",
+        "The v2.0 VALID to v2.1 ALIGNED incompatibility is detected."
+      ],
+      "design_constraints": [
+        "The state transition must be deterministic.",
+        "Generated test proposals must not modify controlled artifacts.",
+        "Timing measurements use a monotonic test-bench clock."
+      ],
+      "existing_test_ids": [
+        "UT-034",
+        "UT-035",
+        "CT-012",
+        "IT-045",
+        "SWE6-VT-008"
+      ],
+      "safety_notes": [
+        "Power transfer must remain inhibited when alignment evidence is invalid.",
+        "AI-generated tests require engineering and safety review before baselining."
+      ],
+      "evidence_ids": [
+        "SWE-REQ-014",
+        "ARCH-COMP-004",
+        "ARCH-COMP-005",
+        "ARCH-IF-006",
+        "DD-018",
+        "SW-UNIT-007",
+        "IT-045"
+      ]
+    },
+    {
+      "requirement_id": "SWE-REQ-030",
+      "requirement_text": "When an authenticated charging session is cancelled, the controller shall open the power contactor within 150 ms and record cancellation reason USER_REQUEST.",
+      "architecture_context": [
+        "SessionController receives the cancellation event.",
+        "PowerContactorController opens the contactor and records the reason."
+      ],
+      "interface_contracts": [
+        "CancellationReason includes USER_REQUEST.",
+        "ContactorState includes OPEN and CLOSED."
+      ],
+      "acceptance_criteria": [
+        "Contactor opens no later than 150 ms.",
+        "Cancellation reason USER_REQUEST is persisted."
+      ],
+      "design_constraints": [
+        "Timing uses a monotonic clock."
+      ],
+      "existing_test_ids": [
+        "IT-030"
+      ],
+      "safety_notes": [
+        "Generated tests remain proposals until reviewed."
+      ],
+      "evidence_ids": [
+        "SWE-REQ-030",
+        "ARCH-COMP-030",
+        "IT-030"
+      ]
+    }
+  ]
+}

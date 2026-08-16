@@ -12,7 +12,6 @@ from traceai.engineering_loader import load_engineering_dataset
 from traceai.engineering_reporting import write_engineering_report
 from traceai.exceptions import TraceAIError
 from traceai.intelligence import EngineeringIntelligenceService
-from traceai.pipeline import run_analysis
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -54,6 +53,9 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("outputs/engineering_intelligence_report.json"),
         help="JSON evidence report path",
     )
+    from traceai.ai_cli import add_ai_parser
+
+    add_ai_parser(subparsers)
     return parser
 
 
@@ -64,6 +66,13 @@ def main(argv: list[str] | None = None) -> None:
         if args.command == "trace":
             _run_trace_command(args)
             return
+        if args.command == "ai":
+            from traceai.ai_cli import run_ai_command
+
+            run_ai_command(args)
+            return
+        from traceai.pipeline import run_analysis
+
         report, output_paths = run_analysis(args.input, args.output_dir)
     except TraceAIError as exc:
         print(f"error: {exc}", file=sys.stderr)

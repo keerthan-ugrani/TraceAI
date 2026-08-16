@@ -16,3 +16,9 @@ These requirements govern the PoC implementation. They do not describe the vehic
 | POC-SWR-010 | The system shall provide CLI and Streamlit interfaces for Requirement-ID analysis using the same application service. | Integration test and demonstration |
 | POC-SWR-011 | The original requirements-quality analysis shall remain runnable after the digital-thread revision. | Regression test |
 | POC-SWR-012 | CI shall run format, lint, type, security, unit, integration, verification, coverage, build, smoke, and dependency checks without external LLM calls. | CI inspection |
+| POC-AI-001 | The system shall support a real structured-output LLM for evidence-grounded root-cause hypotheses while rejecting citations outside the controlled evidence package. | Automated verification and mocked provider integration |
+| POC-AI-002 | The system shall use an embedding model to rank candidate engineering trace links without automatically accepting or writing those links. | Automated verification |
+| POC-AI-003 | The system shall use a structured-output LLM to identify semantic requirement-quality issues and propose measurable wording without approving the requirement. | Automated verification |
+| POC-AI-004 | The system shall use a structured-output LLM to summarize a controlled engineering log, separate observations from hypotheses, and cite evidence IDs. | Automated verification |
+| POC-AI-005 | The system shall use embeddings to retrieve similar controlled historical defects and shall state that similarity does not prove an identical root cause. | Automated verification |
+| POC-AI-006 | The system shall use a structured-output LLM to propose traced verification cases that remain in `PROPOSED` review state and never claim execution or approval. | Automated verification |
