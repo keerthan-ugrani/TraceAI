@@ -3,7 +3,9 @@
 **AI-assisted ASPICE digital thread, configuration management, traceability,
 change impact, release intelligence, and evidence-backed root-cause analysis.**
 
-TraceAI is a standalone four-day proof of concept for automotive engineering. Its hero
+TraceAI is a standalone engineering-intelligence proof of concept for automotive engineering.
+Version 2 adds six governed real-model workflows on top of the original deterministic digital
+thread. Its hero
 workflow is:
 
 > Enter a Requirement ID → reconstruct the complete engineering digital thread → find
@@ -39,6 +41,27 @@ Given `SWE-REQ-014`, answer:
 - Which defect and change request are related?
 - What is the probable root cause, based only on retrieved evidence?
 - Is the release deterministically eligible?
+
+## v2 real AI enhancements
+
+TraceAI v2 provides two model modes:
+
+- `--provider openai` uses a real OpenAI structured-output model and embedding model;
+- `--provider demo` is a deterministic, explicitly non-AI offline fallback for CI/tutorials.
+
+| # | Enhancement | Real-model implementation |
+| --- | --- | --- |
+| 1 | Root-cause hypotheses | `gpt-5.6` structured output grounded in deterministic failure evidence |
+| 2 | Semantic trace-link recommendations | `text-embedding-3-small` plus cosine ranking |
+| 3 | Requirement-quality review | Structured ambiguity/testability findings and measurable rewrite |
+| 4 | Engineering-log analysis | Structured timeline, anomalies, hypotheses, and checks |
+| 5 | Similar-defect retrieval | Embedding search over controlled synthetic defect history |
+| 6 | AI-assisted test generation | Structured proposed unit/component/integration/software tests |
+
+Every result is validated, evidence-cited, versioned, and marked `PROPOSED`. AI never changes
+traceability, test status, configuration, baseline, or release eligibility. See the
+[AI architecture](docs/architecture/ai_architecture.md) and
+[AI governance](docs/AI_GOVERNANCE.md).
 
 ## ASPICE concepts represented
 
@@ -129,8 +152,9 @@ interface versions, commits, source files, test history, defect, and change requ
 constructs a typed evidence package. The reasoning service returns a **probable** interface
 contract inconsistency with evidence IDs and recommended engineering checks.
 
-An offline deterministic reasoning fallback is the default. An external LLM adapter can be
-added later behind the same protocol, and its Pydantic output must satisfy the same contract.
+The original digital-thread command uses an offline deterministic reasoning fallback. The v2
+`traceai ai` commands use the real OpenAI adapter when `--provider openai` is selected. Both
+paths use validated Pydantic output and retain a human-review boundary.
 
 ## Change and release intelligence
 
@@ -179,8 +203,15 @@ traceai/
 ├── app.py                         # Streamlit dashboard
 ├── data/
 │   ├── engineering_data.json      # Digital-thread scenario
-│   └── requirements.csv           # Preserved SWE.1 quality sample
+│   ├── requirements.csv           # Preserved SWE.1 quality sample
+│   └── ai_knowledge.json          # Synthetic AI retrieval/generation corpus
 ├── src/traceai/
+│   ├── ai_models.py               # AI inputs, drafts, reports, provenance
+│   ├── ai_loader.py               # Validated synthetic knowledge adapter
+│   ├── ai_gateway.py              # Real OpenAI + non-AI demo gateways
+│   ├── ai_prompts.py              # Versioned structured-output prompts
+│   ├── ai_services.py             # Enhancements 1–6 and governance
+│   ├── ai_cli.py                  # AI CLI adapter
 │   ├── engineering_models.py      # Artifact, edge, report contracts
 │   ├── engineering_loader.py      # Validated persistence adapter
 │   ├── engineering_graph.py       # Bidirectional traversal
@@ -218,8 +249,11 @@ Prerequisites: Git, Python 3.11 or 3.12, and
 ```bash
 git clone https://github.com/<your-user>/traceai.git
 cd traceai
-uv sync --extra dev
+uv sync --extra dev --extra ai --locked
 ```
+
+The `ai` extra installs the OpenAI Python SDK. Base TraceAI functionality still uses no external
+model.
 
 ## Run the hero analysis
 
@@ -253,6 +287,44 @@ The original requirements-quality command remains available:
 ```bash
 uv run traceai analyze --input data/requirements.csv --output-dir outputs
 ```
+
+## Run all six AI enhancements offline
+
+This is reproducible and makes no model API calls:
+
+```bash
+uv run traceai ai suite SWE-REQ-014 \
+  --provider demo \
+  --output outputs/ai/demo-suite.json
+```
+
+The output states `live_model_used: false`; do not present demo mode as real AI.
+
+## Run all six enhancements with real models
+
+Set `OPENAI_API_KEY` in your shell without placing it in a tracked file, then run:
+
+```bash
+uv run traceai ai suite SWE-REQ-014 \
+  --provider openai \
+  --generation-model gpt-5.6 \
+  --embedding-model text-embedding-3-small \
+  --output outputs/ai/live-suite.json
+```
+
+Individual capabilities are also available:
+
+```bash
+uv run traceai ai rca SWE-REQ-014 --provider openai
+uv run traceai ai trace-links SWE-REQ-014 --provider openai
+uv run traceai ai requirement-review SWE-REQ-031 --provider openai
+uv run traceai ai log-analysis LOG-IT-045 --provider openai
+uv run traceai ai similar-defects LOG-IT-045 --provider openai
+uv run traceai ai test-generation SWE-REQ-014 --provider openai
+```
+
+Live suite mode performs multiple billable model requests. Review the synthetic input and your
+account controls before running it.
 
 ## Run the dashboard
 
@@ -290,8 +362,8 @@ No external AI API is called in CI.
 ## Docker
 
 ```bash
-docker build -t traceai:0.2.0 .
-docker run --rm -p 8501:8501 traceai:0.2.0
+docker build -t traceai:2.0.0 .
+docker run --rm -p 8501:8501 traceai:2.0.0
 ```
 
 ## Design decisions
@@ -314,6 +386,9 @@ docker run --rm -p 8501:8501 traceai:0.2.0
 - Synthetic timestamps and verification evidence
 - Heuristic advisory RCA fallback; not a safety decision
 - No authentication or multi-user authorization in the local Streamlit app
+- Live model mode requires an OpenAI API key and incurs API usage
+- No production secret manager, private endpoint, data-residency policy, or model evaluation set
+- Synthetic semantic corpus is intentionally small and does not establish production accuracy
 - No formal Automotive SPICE assessment or compliance claim
 
 ## Future enterprise integrations
@@ -325,9 +400,15 @@ the current service contracts and deterministic rules.
 
 ## Tutorials
 
-- [Day 1 build-along](docs/BUILD_ALONG_DAY_1.md)
+- [Beginner Day 1 build-along](docs/BEGINNER_BUILD_ALONG_DAY_1.md)
+- [Beginner Day 2 build-along](docs/BEGINNER_BUILD_ALONG_DAY_2.md)
+- [Beginner Day 3 build-along](docs/BEGINNER_BUILD_ALONG_DAY_3.md)
+- [Beginner Day 4 build-along](docs/BEGINNER_BUILD_ALONG_DAY_4.md)
+- [Beginner AI Enhancements 1–6 build-along](docs/BEGINNER_BUILD_ALONG_AI_ENHANCEMENTS.md)
 - [Complete four-day tutorial](docs/COMPLETE_BUILD_TUTORIAL.md)
 - [Implementation issue backlog](docs/ISSUES_FOUR_DAY.md)
+- [Five-minute interview demonstration](docs/INTERVIEW_DEMO.md)
+- [Sample six-enhancement output](docs/SAMPLE_AI_OUTPUT.md)
 
 ## License
 

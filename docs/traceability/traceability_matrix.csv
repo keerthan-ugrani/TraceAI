@@ -11,3 +11,9 @@ POC-SWR-009,RootCauseAnalysis,src/traceai/engineering_models.py;src/traceai/reas
 POC-SWR-010,Application Interfaces,src/traceai/intelligence.py;src/traceai/cli.py;app.py,VER-010
 POC-SWR-011,RequirementQualityAnalyzer,src/traceai/analyzer.py;src/traceai/pipeline.py,VER-011
 POC-SWR-012,CI Pipeline,.github/workflows/ci.yml;Makefile,VER-012
+POC-AI-001,AIEngineeringCopilot;OpenAIModelGateway,src/traceai/ai_services.py;src/traceai/ai_gateway.py;src/traceai/ai_prompts.py,VER-AI-001
+POC-AI-002,AIEngineeringCopilot;Embedding Gateway,src/traceai/ai_services.py;src/traceai/ai_gateway.py,VER-AI-002
+POC-AI-003,AIEngineeringCopilot;OpenAIModelGateway,src/traceai/ai_services.py;src/traceai/ai_models.py;src/traceai/ai_prompts.py,VER-AI-003
+POC-AI-004,AIEngineeringCopilot;OpenAIModelGateway,src/traceai/ai_services.py;src/traceai/ai_models.py;src/traceai/ai_prompts.py,VER-AI-004
+POC-AI-005,AIEngineeringCopilot;Embedding Gateway,src/traceai/ai_services.py;src/traceai/ai_gateway.py;data/ai_knowledge.json,VER-AI-005
+POC-AI-006,AIEngineeringCopilot;OpenAIModelGateway,src/traceai/ai_services.py;src/traceai/ai_models.py;src/traceai/ai_prompts.py,VER-AI-006
