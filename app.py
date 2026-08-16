@@ -4,16 +4,29 @@ from pathlib import Path
 
 import streamlit as st
 
+from traceai.ai_gateway import OpenAIModelGateway, SyntheticDemoGateway
+from traceai.ai_loader import load_ai_knowledge
+from traceai.ai_services import AIEngineeringCopilot
 from traceai.engineering_graph import EngineeringGraph
 from traceai.engineering_loader import load_engineering_dataset
 from traceai.intelligence import EngineeringIntelligenceService
 
 DATA_PATH = Path(__file__).parent / "data" / "engineering_data.json"
+AI_DATA_PATH = Path(__file__).parent / "data" / "ai_knowledge.json"
 
 
 @st.cache_resource
 def build_service() -> EngineeringIntelligenceService:
     return EngineeringIntelligenceService(EngineeringGraph(load_engineering_dataset(DATA_PATH)))
+
+
+def build_ai_copilot(provider: str) -> AIEngineeringCopilot:
+    gateway = OpenAIModelGateway() if provider == "openai" else SyntheticDemoGateway()
+    return AIEngineeringCopilot(
+        load_ai_knowledge(AI_DATA_PATH),
+        EngineeringGraph(load_engineering_dataset(DATA_PATH)),
+        gateway,
+    )
 
 
 def main() -> None:
@@ -29,12 +42,15 @@ def main() -> None:
         value="SWE-REQ-014",
         help="Try SWE-REQ-014 for the failure scenario or SWE-REQ-030 for a healthy thread.",
     )
-    if not st.button("Analyse", type="primary"):
+    if st.button("Analyse", type="primary"):
+        st.session_state["analyzed_requirement_id"] = requirement_id.strip()
+    if "analyzed_requirement_id" not in st.session_state:
         st.info("Enter a controlled software requirement ID and select Analyse.")
         return
+    analyzed_requirement_id = str(st.session_state["analyzed_requirement_id"])
 
     try:
-        report = build_service().analyze_requirement(requirement_id.strip())
+        report = build_service().analyze_requirement(analyzed_requirement_id)
     except Exception as exc:  # UI boundary converts domain errors to a user-visible message.
         st.error(str(exc))
         return
@@ -123,6 +139,83 @@ def main() -> None:
             st.write(f"- {reason}")
     else:
         st.success(f"{report.release_eligibility.release_id} is eligible.")
+
+    st.divider()
+    st.subheader("AI Enhancements 1-6")
+    st.caption(
+        "Run the offline demo without an API key, or select OpenAI to invoke real structured "
+        "generation and embedding models. Every result remains PROPOSED."
+    )
+    provider = st.radio(
+        "AI provider",
+        options=("demo", "openai"),
+        horizontal=True,
+        help="demo is deterministic and not AI; openai makes real model API calls.",
+    )
+    inputs = st.columns(2)
+    quality_requirement_id = inputs[0].text_input(
+        "Draft requirement for quality review", value="SWE-REQ-031"
+    )
+    log_id = inputs[1].text_input("Engineering log", value="LOG-IT-045")
+    if not st.button("Run AI Suite"):
+        return
+
+    try:
+        with st.spinner("Running six governed AI workflows..."):
+            copilot = build_ai_copilot(provider)
+            rca = copilot.analyze_root_cause(analyzed_requirement_id)
+            links = copilot.recommend_trace_links(analyzed_requirement_id)
+            quality = copilot.review_requirement(quality_requirement_id.strip())
+            logs = copilot.analyze_log(log_id.strip())
+            defects = copilot.retrieve_similar_defects(log_id.strip())
+            tests = copilot.generate_tests(analyzed_requirement_id)
+    except Exception as exc:  # UI boundary converts provider/domain errors to a safe message.
+        st.error(str(exc))
+        return
+
+    st.warning(
+        f"Provider: {rca.provenance.provider} · live model: "
+        f"{rca.provenance.live_model_used} · review state: PROPOSED"
+    )
+    tabs = st.tabs(
+        [
+            "1 · RCA",
+            "2 · Trace links",
+            "3 · Requirement",
+            "4 · Logs",
+            "5 · Defects",
+            "6 · Tests",
+        ]
+    )
+    with tabs[0]:
+        st.write(rca.analysis.summary)
+        st.json(rca.analysis.model_dump(mode="json"), expanded=False)
+    with tabs[1]:
+        st.dataframe(
+            [item.model_dump(mode="json") for item in links.recommendations],
+            width="stretch",
+            hide_index=True,
+        )
+    with tabs[2]:
+        st.write(quality.review.summary)
+        st.code(quality.review.rewritten_requirement)
+        st.json(quality.review.model_dump(mode="json"), expanded=False)
+    with tabs[3]:
+        st.write(logs.analysis.summary)
+        st.json(logs.analysis.model_dump(mode="json"), expanded=False)
+    with tabs[4]:
+        st.dataframe(
+            [item.model_dump(mode="json") for item in defects.matches],
+            width="stretch",
+            hide_index=True,
+        )
+    with tabs[5]:
+        st.write(tests.plan.coverage_summary)
+        st.dataframe(
+            [item.model_dump(mode="json") for item in tests.plan.test_cases],
+            width="stretch",
+            hide_index=True,
+        )
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ COPY src ./src
 COPY data ./data
 COPY app.py ./app.py
 
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --extra ai
 
 RUN addgroup --system traceai \
     && adduser --system --ingroup traceai traceai \

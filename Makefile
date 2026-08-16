@@ -1,10 +1,10 @@
 export UV_CACHE_DIR ?= $(abspath $(CURDIR)/../.traceai-cache/uv)
 export XDG_CACHE_HOME ?= $(abspath $(CURDIR)/../.traceai-cache)
 
-.PHONY: setup format lint typecheck security test test-unit test-integration test-verification coverage analyze trace dashboard build audit ci
+.PHONY: setup format lint typecheck security test test-unit test-integration test-verification coverage analyze trace ai-demo ai-live dashboard build audit ci
 
 setup:
-	uv sync --extra dev
+	uv sync --extra dev --extra ai
 
 format:
 	uv run ruff format .
@@ -39,6 +39,12 @@ analyze:
 
 trace:
 	uv run traceai trace SWE-REQ-014 --data data/engineering_data.json --output outputs/engineering_intelligence_report.json
+
+ai-demo:
+	uv run traceai ai suite SWE-REQ-014 --provider demo --output outputs/ai/demo-suite.json
+
+ai-live:
+	uv run traceai ai suite SWE-REQ-014 --provider openai --output outputs/ai/live-suite.json
 
 dashboard:
 	uv run streamlit run app.py
