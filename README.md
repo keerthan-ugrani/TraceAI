@@ -398,18 +398,6 @@ Jenkins, Azure DevOps, Jira, test-management systems, PLM, and ALM. At enterpris
 replace local JSON with an audited relational or graph persistence adapter while retaining
 the current service contracts and deterministic rules.
 
-## Tutorials
-
-- [Beginner Day 1 build-along](docs/BEGINNER_BUILD_ALONG_DAY_1.md)
-- [Beginner Day 2 build-along](docs/BEGINNER_BUILD_ALONG_DAY_2.md)
-- [Beginner Day 3 build-along](docs/BEGINNER_BUILD_ALONG_DAY_3.md)
-- [Beginner Day 4 build-along](docs/BEGINNER_BUILD_ALONG_DAY_4.md)
-- [Beginner AI Enhancements 1–6 build-along](docs/BEGINNER_BUILD_ALONG_AI_ENHANCEMENTS.md)
-- [Complete four-day tutorial](docs/COMPLETE_BUILD_TUTORIAL.md)
-- [Implementation issue backlog](docs/ISSUES_FOUR_DAY.md)
-- [Five-minute interview demonstration](docs/INTERVIEW_DEMO.md)
-- [Sample six-enhancement output](docs/SAMPLE_AI_OUTPUT.md)
-
 ## License
 
 MIT
